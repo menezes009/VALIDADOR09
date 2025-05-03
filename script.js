@@ -18,12 +18,12 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="usado">❌ Código já utilizado por ' + item.nome + '</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
-        codigosLidos.push(codigo);  // só agora marca como lido
         salvarCheckin(item.nome);
         atualizarLista();
+        codigosLidos.push(codigo); // marca como lido somente se for válido e liberado
       }
       esperando = true;
-      setTimeout(() => esperando = false, 6000);  // intervalo de 6s
+      setTimeout(() => esperando = false, 6000);
     });
 }
 
@@ -75,11 +75,8 @@ function startScanner() {
 
       if (esperando) return;
 
-      if (codigosLidos.includes(codigo)) {
-        document.getElementById('resultado').innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
-      } else {
-        validarCodigo(codigo);
-      }
+      // a checagem de "já lido" será feita após verificar se é válido
+      validarCodigo(codigo);
     },
     (errorMessage) => { }
   ).catch(err => {
