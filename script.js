@@ -15,6 +15,8 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="invalido">Código inválido.</p>';
       } else if (item.presenca === "sim") {
         resultadoEl.innerHTML = '<p class="usado">❌ Código já utilizado por ' + item.nome + '</p>';
+      } else if (esperando || codigosLidos.includes(codigo)) {
+        resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
         codigosLidos.push(codigo);
@@ -48,6 +50,18 @@ function resetarTudo() {
   document.getElementById("resultado").innerHTML = '<p class="invalido">Lista de check-ins zerada.</p>';
 }
 
+function exportarLista() {
+  const lista = JSON.parse(localStorage.getItem("checkins") || "[]");
+  const csvContent = "data:text/csv;charset=utf-8," + lista.map(nome => `${nome}`).join("\n");
+  const encodedUri = encodeURI(csvContent);
+  const link = document.createElement("a");
+  link.setAttribute("href", encodedUri);
+  link.setAttribute("download", "checkins.csv");
+  document.body.appendChild(link);
+  link.click();
+  document.body.removeChild(link);
+}
+
 function startScanner() {
   scanner = new Html5Qrcode("reader");
   const config = { fps: 10, qrbox: 250 };
@@ -57,14 +71,13 @@ function startScanner() {
     config,
     (decodedText) => {
       const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
-
-      const resultadoEl = document.getElementById('resultado');
-      if (codigosLidos.includes(codigo)) {
-        resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
-        return;
+      if (esperando || codigosLidos.includes(codigo)) {
+        document.getElementById('resultado').innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
+      } else {
+        esperando = true;
+        validarCodigo(codigo);
+        setTimeout(() => esperando = false, 2500);
       }
-
-      validarCodigo(codigo);
     },
     (errorMessage) => { }
   ).catch(err => {
@@ -72,5 +85,6 @@ function startScanner() {
   });
 }
 
+let esperando = false;
 startScanner();
 atualizarLista();
