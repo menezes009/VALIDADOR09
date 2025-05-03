@@ -22,6 +22,7 @@ function validarCodigo(codigo) {
       }
 
       setTimeout(() => {
+        ultimaLeitura = "";
         startScanner(); // reinicia a câmera após leitura
       }, 2000);
     });
@@ -50,12 +51,6 @@ function desfazerUltimo() {
   localStorage.setItem("checkins", JSON.stringify(lista));
   atualizarLista();
   document.getElementById("resultado").innerHTML = '<p class="invalido">Último check-in removido.</p>';
-}
-
-function resetarTudo() {
-  localStorage.removeItem("checkins");
-  atualizarLista();
-  document.getElementById("resultado").innerHTML = '<p class="invalido">Lista de check-ins zerada.</p>';
 }
 
 let scanner;
