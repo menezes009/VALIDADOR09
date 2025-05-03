@@ -1,12 +1,12 @@
 
-let ultimaLeitura = "";
+let scanner;
+let codigosLidos = [];
 
 function validarCodigo(codigo) {
   fetch('data.json')
     .then(response => response.json())
     .then(data => {
       const resultadoEl = document.getElementById('resultado');
-      const listaEl = document.getElementById('lista-validacoes');
       const item = data.find(entry => entry.codigo === codigo);
 
       if (!codigo) {
@@ -15,16 +15,14 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="invalido">Código inválido.</p>';
       } else if (item.presenca === "sim") {
         resultadoEl.innerHTML = '<p class="usado">❌ Código já utilizado por ' + item.nome + '</p>';
+      } else if (codigosLidos.includes(codigo)) {
+        resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
         salvarCheckin(item.nome);
         atualizarLista();
+        codigosLidos.push(codigo);
       }
-
-      setTimeout(() => {
-        ultimaLeitura = "";
-        startScanner(); // reinicia a câmera após leitura
-      }, 2000);
     });
 }
 
@@ -45,29 +43,7 @@ function atualizarLista() {
   });
 }
 
-function desfazerUltimo() {
-  const lista = JSON.parse(localStorage.getItem("checkins") || "[]");
-  lista.pop();
-  localStorage.setItem("checkins", JSON.stringify(lista));
-  atualizarLista();
-  document.getElementById("resultado").innerHTML = '<p class="invalido">Último check-in removido.</p>';
-}
-
-let scanner;
-
 function startScanner() {
-  if (scanner) {
-    scanner.stop().then(() => {
-      iniciar();
-    }).catch(() => {
-      iniciar();
-    });
-  } else {
-    iniciar();
-  }
-}
-
-function iniciar() {
   scanner = new Html5Qrcode("reader");
   const config = { fps: 10, qrbox: 250 };
 
@@ -75,12 +51,9 @@ function iniciar() {
     { facingMode: "environment" },
     config,
     (decodedText, decodedResult) => {
-      if (decodedText !== ultimaLeitura) {
-        ultimaLeitura = decodedText;
-        scanner.stop().then(() => {
-          const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
-          validarCodigo(codigo);
-        });
+      const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
+      if (!codigosLidos.includes(codigo)) {
+        validarCodigo(codigo);
       }
     },
     (errorMessage) => { }
