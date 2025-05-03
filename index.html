@@ -5,16 +5,32 @@
   <meta charset="UTF-8">
   <title>Check-in Festa</title>
   <meta name="viewport" content="width=device-width, initial-scale=1">
+  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
   <style>
-    body { font-family: sans-serif; text-align: center; padding: 30px; }
-    .ok { color: green; font-size: 24px; }
-    .usado { color: red; font-size: 24px; }
-    .invalido { color: orange; font-size: 24px; }
+    body { font-family: sans-serif; text-align: center; padding: 20px; }
+    #reader { width: 100%; max-width: 400px; margin: auto; }
+    .status { font-size: 22px; margin-top: 20px; }
+    .ok { color: green; }
+    .usado { color: red; }
+    .invalido { color: orange; }
+    #checkin-list { margin-top: 30px; text-align: left; max-width: 400px; margin: auto; }
+    #checkin-list ul { padding-left: 20px; }
+    button { margin: 5px; padding: 10px 20px; font-size: 16px; }
   </style>
 </head>
 <body>
-  <h1>Validação de QR Code</h1>
-  <div id="resultado">Validando...</div>
+  <h1>Check-in da Festa</h1>
+  <p>Escaneie o QR Code do convidado</p>
+  <div id="reader"></div>
+  <div id="resultado" class="status">Aguardando leitura...</div>
+
+  <div id="checkin-list">
+    <h2>✅ Validados</h2>
+    <ul id="lista-validacoes"></ul>
+    <button onclick="desfazerUltimo()">⏪ Desfazer último</button>
+    <button onclick="resetarTudo()">🗑️ Limpar tudo</button>
+  </div>
+
   <script src="script.js"></script>
 </body>
 </html>
