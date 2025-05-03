@@ -1,7 +1,8 @@
 
 let scanner;
 let codigosLidos = [];
-let esperando = false;
+let ultimoCodigoLido = "";
+let aguardando = false;
 
 function validarCodigo(codigo) {
   fetch('data.json')
@@ -16,14 +17,20 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="invalido">Código inválido.</p>';
       } else if (item.presenca === "sim") {
         resultadoEl.innerHTML = '<p class="usado">❌ Código já utilizado por ' + item.nome + '</p>';
+      } else if (codigosLidos.includes(codigo)) {
+        resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
+        codigosLidos.push(codigo);
         salvarCheckin(item.nome);
         atualizarLista();
-        codigosLidos.push(codigo); // marca como lido somente se for válido e liberado
       }
-      esperando = true;
-      setTimeout(() => esperando = false, 6000);
+
+      aguardando = true;
+      setTimeout(() => {
+        aguardando = false;
+        ultimoCodigoLido = "";
+      }, 6000);
     });
 }
 
@@ -47,6 +54,7 @@ function atualizarLista() {
 function resetarTudo() {
   localStorage.removeItem("checkins");
   codigosLidos = [];
+  ultimoCodigoLido = "";
   atualizarLista();
   document.getElementById("resultado").innerHTML = '<p class="invalido">Lista de check-ins zerada.</p>';
 }
@@ -73,9 +81,9 @@ function startScanner() {
     (decodedText) => {
       const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
 
-      if (esperando) return;
+      if (aguardando || codigo === ultimoCodigoLido) return;
 
-      // a checagem de "já lido" será feita após verificar se é válido
+      ultimoCodigoLido = codigo;
       validarCodigo(codigo);
     },
     (errorMessage) => { }
