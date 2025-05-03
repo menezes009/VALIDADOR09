@@ -1,6 +1,7 @@
 
 let scanner;
 let codigosLidos = [];
+let esperando = false;
 
 function validarCodigo(codigo) {
   fetch('data.json')
@@ -15,14 +16,14 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="invalido">Código inválido.</p>';
       } else if (item.presenca === "sim") {
         resultadoEl.innerHTML = '<p class="usado">❌ Código já utilizado por ' + item.nome + '</p>';
-      } else if (esperando || codigosLidos.includes(codigo)) {
-        resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
-        codigosLidos.push(codigo);
+        codigosLidos.push(codigo);  // só agora marca como lido
         salvarCheckin(item.nome);
         atualizarLista();
       }
+      esperando = true;
+      setTimeout(() => esperando = false, 6000);  // intervalo de 6s
     });
 }
 
@@ -71,12 +72,13 @@ function startScanner() {
     config,
     (decodedText) => {
       const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
-      if (esperando || codigosLidos.includes(codigo)) {
+
+      if (esperando) return;
+
+      if (codigosLidos.includes(codigo)) {
         document.getElementById('resultado').innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
-        esperando = true;
         validarCodigo(codigo);
-        setTimeout(() => esperando = false, 6000);
       }
     },
     (errorMessage) => { }
@@ -85,6 +87,5 @@ function startScanner() {
   });
 }
 
-let esperando = false;
 startScanner();
 atualizarLista();
