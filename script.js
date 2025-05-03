@@ -19,9 +19,9 @@ function validarCodigo(codigo) {
         resultadoEl.innerHTML = '<p class="usado">⛔ Código já lido nesta sessão.</p>';
       } else {
         resultadoEl.innerHTML = '<p class="ok">✅ Acesso liberado para ' + item.nome + '</p>';
+        codigosLidos.push(codigo);
         salvarCheckin(item.nome);
         atualizarLista();
-        codigosLidos.push(codigo);
       }
     });
 }
@@ -50,7 +50,7 @@ function startScanner() {
   scanner.start(
     { facingMode: "environment" },
     config,
-    (decodedText, decodedResult) => {
+    (decodedText) => {
       const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
       if (!codigosLidos.includes(codigo)) {
         validarCodigo(codigo);
