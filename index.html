@@ -15,6 +15,7 @@
     .invalido { color: orange; }
     #checkin-list { margin-top: 30px; text-align: left; max-width: 400px; margin: auto; }
     #checkin-list ul { padding-left: 20px; }
+    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
   </style>
 </head>
 <body>
@@ -26,6 +27,7 @@
   <div id="checkin-list">
     <h2>✅ Validados nesta sessão</h2>
     <ul id="lista-validacoes"></ul>
+    <button onclick="resetarTudo()">🗑️ Limpar Tudo</button>
   </div>
 
   <script src="script.js"></script>

@@ -43,6 +43,13 @@ function atualizarLista() {
   });
 }
 
+function resetarTudo() {
+  localStorage.removeItem("checkins");
+  codigosLidos = [];
+  atualizarLista();
+  document.getElementById("resultado").innerHTML = '<p class="invalido">Lista de check-ins zerada.</p>';
+}
+
 function startScanner() {
   scanner = new Html5Qrcode("reader");
   const config = { fps: 10, qrbox: 250 };
