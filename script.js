@@ -1,4 +1,6 @@
 
+let ultimaLeitura = "";
+
 function validarCodigo(codigo) {
   fetch('data.json')
     .then(response => response.json())
@@ -18,6 +20,10 @@ function validarCodigo(codigo) {
         salvarCheckin(item.nome);
         atualizarLista();
       }
+
+      setTimeout(() => {
+        startScanner(); // reinicia a câmera após leitura
+      }, 2000);
     });
 }
 
@@ -52,19 +58,37 @@ function resetarTudo() {
   document.getElementById("resultado").innerHTML = '<p class="invalido">Lista de check-ins zerada.</p>';
 }
 
+let scanner;
+
 function startScanner() {
-  const html5QrCode = new Html5Qrcode("reader");
+  if (scanner) {
+    scanner.stop().then(() => {
+      iniciar();
+    }).catch(() => {
+      iniciar();
+    });
+  } else {
+    iniciar();
+  }
+}
+
+function iniciar() {
+  scanner = new Html5Qrcode("reader");
   const config = { fps: 10, qrbox: 250 };
 
-  html5QrCode.start(
+  scanner.start(
     { facingMode: "environment" },
     config,
     (decodedText, decodedResult) => {
-      html5QrCode.stop();
-      const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
-      validarCodigo(codigo);
+      if (decodedText !== ultimaLeitura) {
+        ultimaLeitura = decodedText;
+        scanner.stop().then(() => {
+          const codigo = decodedText.includes("codigo=") ? decodedText.split("codigo=")[1] : decodedText;
+          validarCodigo(codigo);
+        });
+      }
     },
-    (errorMessage) => {}
+    (errorMessage) => { }
   ).catch(err => {
     document.getElementById('resultado').innerHTML = '<p class="invalido">Erro ao iniciar câmera.</p>';
   });
