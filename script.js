@@ -76,7 +76,7 @@ function startScanner() {
       } else {
         esperando = true;
         validarCodigo(codigo);
-        setTimeout(() => esperando = false, 2500);
+        setTimeout(() => esperando = false, 6000);
       }
     },
     (errorMessage) => { }
