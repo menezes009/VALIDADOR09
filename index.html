@@ -1,36 +1,49 @@
-
 <!DOCTYPE html>
-<html lang="pt-br">
+<html lang="pt-BR">
 <head>
-  <meta charset="UTF-8">
-  <title>Check-in Festa</title>
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <script src="https://unpkg.com/html5-qrcode@2.3.8/html5-qrcode.min.js"></script>
-  <style>
-    body { font-family: sans-serif; text-align: center; padding: 20px; }
-    #reader { width: 100%; max-width: 400px; margin: auto; }
-    .status { font-size: 22px; margin-top: 20px; }
-    .ok { color: green; }
-    .usado { color: red; }
-    .invalido { color: orange; }
-    #checkin-list { margin-top: 30px; text-align: left; max-width: 400px; margin: auto; }
-    #checkin-list ul { padding-left: 20px; }
-    button { margin: 10px; padding: 10px 20px; font-size: 16px; }
-  </style>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Check-in por QR Code – Avulso</title>
+  <link rel="stylesheet" href="styles.css" />
 </head>
 <body>
-  <h1>Check-in da Festa</h1>
-  <p>Escaneie o QR Code do convidado</p>
-  <div id="reader"></div>
-  <div id="resultado" class="status">Aguardando leitura...</div>
+  <main class="container">
+    <h1>Check-in – <span id="eventName">Avulso</span></h1>
 
-  <div id="checkin-list">
-    <h2>✅ Validados nesta sessão</h2>
-    <ul id="lista-validacoes"></ul>
-    <button onclick="resetarTudo()">🗑️ Limpar Tudo</button>
-    <button onclick="exportarLista()">📤 Exportar Check-ins</button>
-  </div>
+    <section class="controls">
+      <label>
+        Câmera:
+        <select id="cameraSelect"></select>
+      </label>
+      <button id="btnStart">Iniciar Leitura</button>
+      <button id="btnStop" disabled>Parar</button>
+      <div class="hint">Dica: aproxime o QR do centro do vídeo.</div>
+    </section>
 
-  <script src="script.js"></script>
+    <section class="preview">
+      <video id="video" playsinline></video>
+      <canvas id="canvas" class="hidden"></canvas>
+    </section>
+
+    <section class="status">
+      <div id="statusBadge" class="badge">Aguardando…</div>
+      <div id="guestInfo" class="guest"></div>
+    </section>
+
+    <section class="manual">
+      <h2>Entrada manual (fallback)</h2>
+      <input id="manualCode" type="text" placeholder="Digite ou cole o código" />
+      <button id="btnManual">Validar código</button>
+    </section>
+
+    <footer>
+      <small>Versão: <span id="appMode">SIMPLER</span> · © Você</small>
+    </footer>
+  </main>
+
+  <!-- Por padrão: modo SIMPLER -->
+  <script src="app.js"></script>
+  <!-- Para Firebase (persistente), comente a linha acima e descomente a abaixo: -->
+  <!-- <script type="module" src="app.firebase.js"></script> -->
 </body>
 </html>
